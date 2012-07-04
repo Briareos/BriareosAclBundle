@@ -1,0 +1,29 @@
+Briareos\AclBundle\Entity\AclRole:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: [name]
+            message: A group with the provided name already exists
+            groups: [admin]
+    properties:
+        name:
+            - NotBlank:
+                message: Please enter a group name
+                groups: [admin]
+            - MinLength:
+                limit: 2
+                groups: [admin]
+            - MaxLength:
+                limit: 24
+                groups: [admin]
+
+Briareos\AclBundle\Entity\AclPermission:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: [name]
+    properties:
+        name:
+            - NotBlank:
+            - MinLength:
+                limit: 2
+            - MaxLength:
+                limit: 24

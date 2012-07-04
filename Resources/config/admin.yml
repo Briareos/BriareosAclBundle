@@ -1,0 +1,15 @@
+services:
+    sonata.admin.briareos_acl.role_admin:
+        class: Briareos\AclBundle\Admin\RoleAdmin
+        arguments:
+            - null
+            - Briareos\AclBundle\Entity\Role
+            - SonataAdminBundle:CRUD
+        tags:
+            - { name: sonata.admin, manager_type: orm }
+        calls:
+            - [ setContainer, [ @service_container ] ]
+    permission_container.briareos_acl:
+        class: Briareos\AclBundle\Admin\Permissions
+        tags:
+            - { name: security.permission_container }

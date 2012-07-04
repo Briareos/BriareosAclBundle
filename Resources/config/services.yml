@@ -1,0 +1,5 @@
+services:
+    form.type.role_permissions:
+        class: Briareos\AclBundle\Form\Type\RolePermissionsType
+        tags:
+            - { name: form.type, alias: role_permissions }

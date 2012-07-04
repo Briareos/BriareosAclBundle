@@ -1,0 +1,65 @@
+Briareos\AclBundle\Entity\AclPermission:
+    type: entity
+    table: acl__permission
+    repositoryClass: Gedmo\Tree\Entity\Repository\NestedTreeRepository
+    gedmo:
+        tree:
+            type: materializedPath
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+            gedmo:
+                - treePathSource
+        description:
+            type: string
+            length: 255
+            nullable: true
+        secure:
+            type: boolean
+            default: false
+        path:
+            type: string
+            length: 255
+            gedmo:
+                treePath:
+                    source: '.'
+        left:
+            type: integer
+            gedmo:
+                - treeLeft
+        right:
+            type: integer
+            gedmo:
+                - treeRight
+        root:
+            type: integer
+            nullable: true
+            gedmo:
+                - treeRoot
+        level:
+            type: integer
+            gedmo:
+                - treeLevel
+    manyToOne:
+        parent:
+            targetEntity: Briareos\AclBundle\Entity\AclPermission
+            inversedBy: children
+            joinColumn:
+                name: parent_id
+                referencedColumnName: id
+                onDelete: SET NULL
+            gedmo:
+                - treeParent
+    oneToMany:
+        children:
+            targetEntity: Briareos\AclBundle\Entity\AclPermission
+            mappedBy: parent
+            orderBy:
+                left: ASC
+    lifecycleCallbacks: {  }
