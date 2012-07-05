@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Briareos\AclBundle\Security\Authorization\PermissionResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class PermissionVoter implements VoterInterface
+class AclVoter implements VoterInterface
 {
     private $roleResolver;
 
@@ -59,6 +59,9 @@ class PermissionVoter implements VoterInterface
      */
     function vote(TokenInterface $token, $object, array $attributes)
     {
+        if($attributes[0]=='super_admin') return self::ACCESS_ABSTAIN;
+        //var_dump($attributes);
+        return self::ACCESS_GRANTED;
         foreach ($attributes as $attribute) {
             if ($this->supportsAttribute($attribute)) {
                 $roles = $this->roleResolver->getPermissions($token);

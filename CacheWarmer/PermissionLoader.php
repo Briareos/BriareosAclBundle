@@ -3,15 +3,15 @@
 namespace Briareos\AclBundle\CacheWarmer;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Briareos\AclBundle\Security\Authorization\PermissionBuilder;
 
 class PermissionLoader implements CacheWarmerInterface
 {
-    private $container;
+    private $permissionBuilder;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(PermissionBuilder $permissionBuilder)
     {
-        $this->container = $container;
+        $this->permissionBuilder = $permissionBuilder;
     }
 
     /**
@@ -37,8 +37,7 @@ class PermissionLoader implements CacheWarmerInterface
     function warmUp($cacheDir)
     {
         /** @var $permissionBuilder \Briareos\AclBundle\Security\Authorization\PermissionBuilder */
-        $permissionBuilder = $this->container->get('permission_builder');
-        $permissionBuilder->buildPermissions();
+        $this->permissionBuilder->buildPermissions();
     }
 
 }

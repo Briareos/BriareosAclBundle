@@ -24,3 +24,11 @@ per bundle.
 
         $ php app/console doctrine:schema:update --force
 
+### If you're using *SonataAdminBundle*
+
+1.  Chance the security handler to `sonata.admin.security.handler.briareos_acl`
+
+        sonata_admin:
+            security:
+                handler: sonata.admin.security.handler.briareos_acl
+

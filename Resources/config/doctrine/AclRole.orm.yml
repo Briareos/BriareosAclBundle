@@ -1,10 +1,6 @@
 Briareos\AclBundle\Entity\AclRole:
     type: entity
     table: acl__role
-    repositoryClass: Gedmo\Tree\Entity\Repository\NestedTreeRepository
-    gedmo:
-        tree:
-            type: nested
     id:
         id:
             type: integer
@@ -21,39 +17,6 @@ Briareos\AclBundle\Entity\AclRole:
         internalRole:
             type: integer
             nullable: true
-        left:
-            type: integer
-            gedmo:
-                - treeLeft
-        right:
-            type: integer
-            gedmo:
-                - treeRight
-        root:
-            type: integer
-            nullable: true
-            gedmo:
-                - treeRoot
-        level:
-            type: integer
-            gedmo:
-                - treeLevel
-    manyToOne:
-        parent:
-            targetEntity: Briareos\AclBundle\Entity\AclRole
-            inversedBy: children
-            joinColumn:
-                name: parent_id
-                referencedColumnName: id
-                onDelete: SET NULL
-            gedmo:
-                - treeParent
-    oneToMany:
-        children:
-            targetEntity: Briareos\AclBundle\Entity\AclRole
-            mappedBy: parent
-            orderBy:
-                left: ASC
     manyToMany:
         subjects:
             targetEntity: Briareos\AclBundle\Entity\AclSubjectInterface
@@ -61,30 +24,26 @@ Briareos\AclBundle\Entity\AclRole:
                 name: acl__subject_role
                 joinColumns:
                     subject:
-                        columnName: subject_id
+                        name: subject_id
                         referencedColumnName: id
-                        nullable: false
                         onDelete: CASCADE
                 inverseJoinColumns:
-                    role:
-                        columnName: role_id
+                    aclRole:
+                        name: aclRole_id
                         referencedColumnName: id
-                        nullable: false
                         onDelete: CASCADE
         permissions:
             targetEntity: Briareos\AclBundle\Entity\AclPermission
             joinTable:
                 name: acl__role_permission
                 joinColumns:
-                    role:
-                        columnName: role_id
+                    aclRole:
+                        name: aclRole_id
                         referencedColumnName: id
-                        nullable: false
                         onDelete: CASCADE
                 inverseJoinColumns:
                     permission:
-                        columnName: permission_id
+                        name: permission_id
                         referencedColumnName: id
-                        nullable: false
                         onDelete: CASCADE
     lifecycleCallbacks: {  }

@@ -1,0 +1,23 @@
+parameters:
+    sonata.admin.security.handler.briareos_acl.class: Briareos\AclBundle\Security\Handler\AclSecurityHandler
+    sonata.admin.briareos_acl.acl_role_admin.class: Briareos\AclBundle\Admin\AclRoleAdmin
+    sonata.admin.briareos_acl.permission_container.class: Briareos\AclBundle\Admin\PermissionContainer
+
+services:
+    sonata.admin.security.handler.briareos_acl:
+        class: %sonata.admin.security.handler.briareos_acl.class%
+        arguments: [ @security.context, [ super_admin ] ]
+    sonata.admin.briareos_acl.role_admin:
+        class: %sonata.admin.briareos_acl.acl_role_admin.class%
+        arguments:
+            - null
+            - Briareos\AclBundle\Entity\AclRole
+            - SonataAdminBundle:CRUD
+        tags:
+            - { name: sonata.admin, manager_type: orm }
+        calls:
+            - [ setContainer, [ @service_container ] ]
+    sonata.admin.briareos_acl.permission_container:
+        class: %sonata.admin.briareos_acl.permission_container.class%
+        tags:
+            - { name: security.permission_container }

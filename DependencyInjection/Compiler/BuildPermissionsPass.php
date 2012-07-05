@@ -17,12 +17,12 @@ class BuildPermissionsPass implements CompilerPassInterface
      */
     function process(ContainerBuilder $container)
     {
-        if (false === $container->hasDefinition('permission_builder')) {
+        if (false === $container->hasDefinition('briareos_acl.permission_builder')) {
             return;
         }
 
         /** @var $definition \Symfony\Component\DependencyInjection\DefinitionDecorator */
-        $definition = $container->getDefinition('permission_builder');
+        $definition = $container->getDefinition('briareos_acl.permission_builder');
 
         foreach ($container->findTaggedServiceIds('security.permission_container') as $id => $attributes) {
             $definition->addMethodCall('addPermissionContainer', array(new Reference($id)));

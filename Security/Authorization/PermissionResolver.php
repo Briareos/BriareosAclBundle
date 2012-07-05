@@ -12,13 +12,16 @@ class PermissionResolver
 {
     private $em;
 
+    private $repository;
+
     private $userPermissions = array();
 
     private $rolePermissions = array();
 
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, $class)
     {
         $this->em = $em;
+        $this->repository = $this->em->getRepository($class);
     }
 
     public function getPermissions(TokenInterface $token)

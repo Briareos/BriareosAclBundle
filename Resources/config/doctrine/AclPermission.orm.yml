@@ -4,7 +4,7 @@ Briareos\AclBundle\Entity\AclPermission:
     repositoryClass: Gedmo\Tree\Entity\Repository\NestedTreeRepository
     gedmo:
         tree:
-            type: materializedPath
+            type: nested
     id:
         id:
             type: integer
@@ -14,26 +14,17 @@ Briareos\AclBundle\Entity\AclPermission:
         name:
             type: string
             length: 255
-            gedmo:
-                - treePathSource
         description:
             type: string
             length: 255
             nullable: true
         secure:
             type: boolean
-            default: false
-        path:
-            type: string
-            length: 255
-            gedmo:
-                treePath:
-                    source: '.'
-        left:
+        lft:
             type: integer
             gedmo:
                 - treeLeft
-        right:
+        rgt:
             type: integer
             gedmo:
                 - treeRight
@@ -42,7 +33,7 @@ Briareos\AclBundle\Entity\AclPermission:
             nullable: true
             gedmo:
                 - treeRoot
-        level:
+        lvl:
             type: integer
             gedmo:
                 - treeLevel

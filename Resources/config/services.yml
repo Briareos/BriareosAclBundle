@@ -1,5 +1,34 @@
+parameters:
+    form.type.briareos_acl.role_permissions.class: Briareos\AclBundle\Form\Type\RolePermissionsType
+    briareos_acl.permission_builder.class: Briareos\AclBundle\Security\Authorization\PermissionBuilder
+    briareos_acl.permission_loader.class: Briareos\AclBundle\CacheWarmer\PermissionLoader
+    briareos_acl.permission_resolver.class: Briareos\AclBundle\Security\Authorization\PermissionResolver
+    security.access.briareos_acl_voter.class: Briareos\AclBundle\Security\Authorization\Voter\AclVoter
+
 services:
-    form.type.role_permissions:
-        class: Briareos\AclBundle\Form\Type\RolePermissionsType
+    form.type.briareos_acl.role_permissions:
+        class: %form.type.briareos_acl.role_permissions.class%
         tags:
             - { name: form.type, alias: role_permissions }
+    briareos_acl.permission_builder:
+        class: %briareos_acl.permission_builder.class%
+        arguments:
+            - @doctrine.orm.default_entity_manager
+            - Briareos\AclBundle\Entity\AclPermission
+            - @validator
+    briareos_acl.permission_loader:
+        class: %briareos_acl.permission_loader.class%
+        arguments: [ @briareos_acl.permission_builder ]
+        tags:
+            - { name: kernel.cache_warmer }
+    briareos_acl.permission_resolver:
+        class: %briareos_acl.permission_resolver.class%
+        arguments:
+            - @doctrine.orm.default_entity_manager
+            - Briareos\AclBundle\Entity\AclRole
+    security.access.briareos_acl_voter:
+        class: %security.access.briareos_acl_voter.class%
+        arguments: [ @briareos_acl.permission_resolver ]
+        public: false
+        tags:
+            - { name: security.voter }

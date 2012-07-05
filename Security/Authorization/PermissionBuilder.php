@@ -30,54 +30,49 @@ class PermissionBuilder
 
     public function buildPermissions()
     {
-        $permissionNames = array();
-        $permissionDomains = array();
+        $permissions = array();
         /** @var $permissionContainer PermissionContainerInterface */
         foreach ($this->permissionContainers as $permissionContainer) {
-            $permissionDomains += $permissionContainer->getPermissions();
-            foreach ($permissionDomains as $permissionDomain => $permissions) {
-                foreach ($permissions as $index => $permission) {
-                    if (is_numeric($index)) {
-                        $permissionNames[$permission] = $permissionDomain;
-                    } else {
-                        $permissionNames[$index] = $permissionDomain;
-                    }
-                }
-            }
+            $permissions += $permissionContainer->getPermissions();
         }
-
-        $qb = $this->em->createQueryBuilder();
-        $qb->from($this->repository->getClassName(), 'p', 'p.name');
-        $qb->select('p');
-        $permissionEntities = $qb->getQuery()->execute();
-
-        foreach ($permissionEntities as $permissionName => $permissionEntity) {
-            if (!isset($permissionNames[$permissionName])) {
-                $this->em->remove($permissionEntity);
-            }
+        $aclPermissions = $this->buildContainerPermissions($permissions);
+        foreach ($aclPermissions as $aclPermission) {
+            $this->em->persist($aclPermission);
         }
-
-        foreach ($permissionNames as $permissionName => $permissionDomain) {
-            if (!isset($permissionEntities[$permissionName])) {
-                $newPermission = new Permission();
-                $newPermission->setName($permissionName);
-                $newPermission->setDomain($permissionDomain);
-                if (isset($permissionDomains[$permissionDomain][$permissionName])) {
-                    $permissionSecure = $permissionDomains[$permissionDomain][$permissionName];
-                } else {
-                    $permissionSecure = false;
-                }
-                $newPermission->setSecure($permissionSecure);
-                /** @var $violations \Symfony\Component\Validator\ConstraintViolationList */
-                $violations = $this->validator->validate($newPermission);
-                if ($violations->count()) {
-                    throw new \Exception(sprintf('Violation during permission rebuilding: %s', $violations->getIterator()->current()));
-                }
-                $this->em->persist($newPermission);
-            }
-        }
-
         $this->em->flush();
+    }
+
+    public function buildContainerPermissions(array $permissions, $parent = null, $parentNames = array())
+    {
+        $generatedPermissions = array();
+        $leftPermission = null;
+        foreach ($permissions as $permissionName => $permissionConfiguration) {
+            $aclPermissionClass = $this->repository->getClassName();
+            /** @var $aclPermission \Briareos\AclBundle\Entity\AclPermission */
+            $aclPermission = new $aclPermissionClass();
+            $aclPermission->setName(implode('.', array_merge($parentNames, (array)$permissionName)));
+            if (!empty($permissionConfiguration['description'])) {
+                $aclPermission->setDescription($permissionConfiguration['description']);
+            }
+            if (!empty($permissionConfiguration['secure'])) {
+                $aclPermission->setSecure($permissionConfiguration['secure']);
+            }
+            $generatedPermissions[$aclPermission->getName()] = $aclPermission;
+            if (isset($permissionConfiguration['children']) && is_array($permissionConfiguration['children']) && count($permissionConfiguration['children'])) {
+                $generatedPermissions += $this->buildContainerPermissions($permissionConfiguration['children'], $aclPermission, array_merge($parentNames, (array)$permissionName));
+            }
+
+            if ($parent !== null) {
+                $aclPermission->setParent($parent);
+            }
+
+            // To keep it ordered.
+            if ($leftPermission !== null) {
+                $aclPermission->setLft($leftPermission);
+            }
+            $leftPermission = $aclPermission;
+        }
+        return $generatedPermissions;
     }
 
     public function isOptional()
