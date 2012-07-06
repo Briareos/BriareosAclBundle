@@ -61,6 +61,7 @@ class AclPermission
 
     public function __construct()
     {
+        $this->secure = false;
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
