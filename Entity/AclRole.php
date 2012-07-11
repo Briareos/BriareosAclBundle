@@ -127,7 +127,7 @@ class AclRole
     /**
      * Add permissions
      *
-     * @param Briareos\AclBundle\Entity\AclPermission $permissions
+     * @param \Briareos\AclBundle\Entity\AclPermission $permissions
      * @return AclRole
      */
     public function addAclPermission(\Briareos\AclBundle\Entity\AclPermission $permissions)
@@ -139,7 +139,7 @@ class AclRole
     /**
      * Get permissions
      *
-     * @return Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getPermissions()
     {
@@ -149,7 +149,7 @@ class AclRole
     /**
      * Add subjects
      *
-     * @param App\UserBundle\Entity\User $subjects
+     * @param \App\UserBundle\Entity\User $subjects
      * @return AclRole
      */
     public function addUser(\App\UserBundle\Entity\User $subjects)
@@ -161,10 +161,15 @@ class AclRole
     /**
      * Get subjects
      *
-     * @return Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getSubjects()
     {
         return $this->subjects;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
     }
 }

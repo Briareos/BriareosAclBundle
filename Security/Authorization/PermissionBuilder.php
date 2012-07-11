@@ -9,7 +9,9 @@ use Symfony\Component\Validator\Validator;
 class PermissionBuilder
 {
     private $em;
-
+    /**
+     * @var \Briareos\AclBundle\Entity\AclPermissionRepository
+     */
     private $repository;
 
     private $validator;
@@ -33,11 +35,25 @@ class PermissionBuilder
         $permissions = array();
         /** @var $permissionContainer PermissionContainerInterface */
         foreach ($this->permissionContainers as $permissionContainer) {
-            $permissions += $permissionContainer->getPermissions();
+            $permissions = array_merge_recursive($permissions, $permissionContainer->getPermissions());
         }
         $aclPermissions = $this->buildContainerPermissions($permissions);
-        foreach ($aclPermissions as $aclPermission) {
-            $this->em->persist($aclPermission);
+        $existingAclPermissions = $this->repository->getIndexedByName();
+        $newAclPermissions = array_diff_key($aclPermissions, $existingAclPermissions);
+        $deprecatedAclPermissions = array_diff_key($existingAclPermissions, $aclPermissions);
+        /** @var $newAclPermission \Briareos\AclBundle\Entity\AclPermission */
+        foreach ($newAclPermissions as $newAclPermission) {
+            if (($newAclPermission->getParent() !== null) && isset($existingAclPermissions[$newAclPermission->getParent()->getName()])) {
+                $newAclPermission->setParent($existingAclPermissions[$newAclPermission->getParent()->getName()]);
+            }
+            if (($newAclPermission->getLft() !== null) && isset($existingAclPermissions[$newAclPermission->getLft()->getName()])) {
+                $newAclPermission->setParent($existingAclPermissions[$newAclPermission->getParent()->getName()]);
+            }
+            $this->em->persist($newAclPermission);
+        }
+        /** @var $deprecatedAclPermission \Briareos\AclBundle\Entity\AclPermission */
+        foreach ($deprecatedAclPermissions as $deprecatedAclPermission) {
+            $this->em->remove($deprecatedAclPermission);
         }
         $this->em->flush();
     }
@@ -58,8 +74,8 @@ class PermissionBuilder
                 $aclPermission->setSecure($permissionConfiguration['secure']);
             }
             $generatedPermissions[$aclPermission->getName()] = $aclPermission;
-            if (isset($permissionConfiguration['children']) && is_array($permissionConfiguration['children']) && count($permissionConfiguration['children'])) {
-                $generatedPermissions += $this->buildContainerPermissions($permissionConfiguration['children'], $aclPermission, array_merge($parentNames, (array)$permissionName));
+            if (isset($permissionConfiguration['__children']) && is_array($permissionConfiguration['__children']) && count($permissionConfiguration['__children'])) {
+                $generatedPermissions += $this->buildContainerPermissions($permissionConfiguration['__children'], $aclPermission, array_merge($parentNames, (array)$permissionName));
             }
 
             if ($parent !== null) {

@@ -8,6 +8,9 @@ parameters:
 services:
     form.type.briareos_acl.role_permissions:
         class: %form.type.briareos_acl.role_permissions.class%
+        arguments:
+            - @doctrine.orm.default_entity_manager
+            - Briareos\AclBundle\Entity\AclPermission
         tags:
             - { name: form.type, alias: role_permissions }
     briareos_acl.permission_builder:

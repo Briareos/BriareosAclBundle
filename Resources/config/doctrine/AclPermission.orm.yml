@@ -1,7 +1,7 @@
 Briareos\AclBundle\Entity\AclPermission:
     type: entity
     table: acl__permission
-    repositoryClass: Gedmo\Tree\Entity\Repository\NestedTreeRepository
+    repositoryClass: Briareos\AclBundle\Entity\AclPermissionRepository
     gedmo:
         tree:
             type: nested
@@ -14,6 +14,7 @@ Briareos\AclBundle\Entity\AclPermission:
         name:
             type: string
             length: 255
+            unique: true
         description:
             type: string
             length: 255

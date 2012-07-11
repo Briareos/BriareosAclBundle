@@ -55,7 +55,7 @@ class AclPermission
     private $children;
 
     /**
-     * @var Briareos\AclBundle\Entity\AclPermission
+     * @var \Briareos\AclBundle\Entity\AclPermission
      */
     private $parent;
 
@@ -232,7 +232,7 @@ class AclPermission
     /**
      * Add children
      *
-     * @param Briareos\AclBundle\Entity\AclPermission $children
+     * @param \Briareos\AclBundle\Entity\AclPermission $children
      * @return AclPermission
      */
     public function addAclPermission(\Briareos\AclBundle\Entity\AclPermission $children)
@@ -244,7 +244,7 @@ class AclPermission
     /**
      * Get children
      *
-     * @return Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getChildren()
     {
@@ -254,7 +254,7 @@ class AclPermission
     /**
      * Set parent
      *
-     * @param Briareos\AclBundle\Entity\AclPermission $parent
+     * @param \Briareos\AclBundle\Entity\AclPermission $parent
      * @return AclPermission
      */
     public function setParent(\Briareos\AclBundle\Entity\AclPermission $parent = null)
@@ -266,7 +266,7 @@ class AclPermission
     /**
      * Get parent
      *
-     * @return Briareos\AclBundle\Entity\AclPermission 
+     * @return \Briareos\AclBundle\Entity\AclPermission
      */
     public function getParent()
     {

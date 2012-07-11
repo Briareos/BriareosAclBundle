@@ -16,6 +16,6 @@ class AclSecurityHandler extends RoleSecurityHandler
      */
     function getBaseRole(AdminInterface $admin)
     {
-        return $admin->getCode() . '.%s';
+        return 'admin.%s';
     }
 }

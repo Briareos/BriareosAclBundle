@@ -29,7 +29,6 @@ class AclRoleAdmin extends Admin implements ContainerAwareInterface
             'label' => 'admin.form.role.name',
         ))
             ->add('permissions', 'role_permissions', array(
-            'class'=>'REM\UserBundle\Entity\Permission',
             'label' => 'admin.form.role.permissions',
             'property' => 'name',
             'translation_domain' => 'permissions',
@@ -72,4 +71,8 @@ class AclRoleAdmin extends Admin implements ContainerAwareInterface
     {
         $this->container = $container;
     }
+
+
+
+
 }
