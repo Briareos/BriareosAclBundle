@@ -36,7 +36,7 @@ per bundle.
          */
         private $aclRoles;
 
-    YML
+    Yaml:
 
         # App\UserBundle\Resources\config\doctrine\User.orm.yml
         joinTable:
@@ -53,9 +53,17 @@ per bundle.
                     referencedColumnName: id
                     onDelete: CASCADE
 
-1. Update your schema
+1.  Update your schema
 
         $ php app/console doctrine:schema:update --force
+
+1   Update your `config.yml` file to include addutional form resources:
+
+        # app/config/config.yml
+        twig:
+            resources:
+                form:
+                    - "BriareosAclBundle::fields.html.twig"
 
 ### If you're using *SonataAdminBundle*
 
