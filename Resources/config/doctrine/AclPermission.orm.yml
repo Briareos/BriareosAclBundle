@@ -21,6 +21,8 @@ Briareos\AclBundle\Entity\AclPermission:
             nullable: true
         secure:
             type: boolean
+        weight:
+            type: integer
         lft:
             type: integer
             gedmo:

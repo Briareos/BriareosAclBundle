@@ -29,9 +29,11 @@ services:
         arguments:
             - @doctrine.orm.default_entity_manager
             - Briareos\AclBundle\Entity\AclRole
+            - administrator
     security.access.briareos_acl_voter:
         class: %security.access.briareos_acl_voter.class%
-        arguments: [ @briareos_acl.permission_resolver ]
+        arguments:
+            - @briareos_acl.permission_resolver
         public: false
         tags:
             - { name: security.voter }

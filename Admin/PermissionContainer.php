@@ -11,13 +11,12 @@ class PermissionContainer implements PermissionContainerInterface
         return array(
             'admin' => array(
                 '__children' => array(
-                    'acl_role' => array(
+                    'briareosaclbundle_aclrole' => array(
                         '__children' => array(
-                            'list' => array(),
                             'create' => array(),
+                            'list' => array(),
                             'edit' => array(
                                 '__children' => array(
-                                    'description' => array(),
                                     'permissions' => array(
                                         'secure' => true,
                                     ),

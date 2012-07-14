@@ -6,7 +6,10 @@ parameters:
 services:
     sonata.admin.security.handler.briareos_acl:
         class: %sonata.admin.security.handler.briareos_acl.class%
-        arguments: [ @security.context, [ super_admin ] ]
+        arguments:
+            - @security.context
+            - [ administrator ] ]
+            - @kernel
     sonata.admin.briareos_acl.acl_role_admin:
         class: %sonata.admin.briareos_acl.acl_role_admin.class%
         arguments:

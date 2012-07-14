@@ -59,15 +59,17 @@ class AclVoter implements VoterInterface
      */
     function vote(TokenInterface $token, $object, array $attributes)
     {
-        if($attributes[0]=='super_admin') return self::ACCESS_ABSTAIN;
-        //var_dump($attributes);
-        return self::ACCESS_GRANTED;
+        if (!$this->supportsClass(get_class($object))) {
+            return self::ACCESS_ABSTAIN;
+        }
         foreach ($attributes as $attribute) {
             if ($this->supportsAttribute($attribute)) {
+                $attribute = strtolower($attribute);
                 $roles = $this->roleResolver->getPermissions($token);
                 if (isset($roles[$attribute])) {
                     return self::ACCESS_GRANTED;
                 }
+                if($attribute !== 'administrator') var_dump($attribute);
                 return self::ACCESS_DENIED;
             }
         }

@@ -39,21 +39,19 @@ class PermissionBuilder
         }
         $aclPermissions = $this->buildContainerPermissions($permissions);
         $existingAclPermissions = $this->repository->getIndexedByName();
-        $newAclPermissions = array_diff_key($aclPermissions, $existingAclPermissions);
         $deprecatedAclPermissions = array_diff_key($existingAclPermissions, $aclPermissions);
-        /** @var $newAclPermission \Briareos\AclBundle\Entity\AclPermission */
-        foreach ($newAclPermissions as $newAclPermission) {
-            if (($newAclPermission->getParent() !== null) && isset($existingAclPermissions[$newAclPermission->getParent()->getName()])) {
-                $newAclPermission->setParent($existingAclPermissions[$newAclPermission->getParent()->getName()]);
-            }
-            if (($newAclPermission->getLft() !== null) && isset($existingAclPermissions[$newAclPermission->getLft()->getName()])) {
-                $newAclPermission->setParent($existingAclPermissions[$newAclPermission->getParent()->getName()]);
-            }
-            $this->em->persist($newAclPermission);
-        }
         /** @var $deprecatedAclPermission \Briareos\AclBundle\Entity\AclPermission */
         foreach ($deprecatedAclPermissions as $deprecatedAclPermission) {
             $this->em->remove($deprecatedAclPermission);
+        }
+        foreach ($aclPermissions as $aclPermission) {
+            $this->em->persist($aclPermission);
+        }
+        $this->em->flush();
+        $rootAclPermissions = $this->repository->getRootNodes();
+        foreach ($rootAclPermissions as $rootAclPermission) {
+            $this->repository->reorder($rootAclPermission, 'weight');
+            $this->em->persist($rootAclPermission);
         }
         $this->em->flush();
     }
@@ -61,12 +59,22 @@ class PermissionBuilder
     public function buildContainerPermissions(array $permissions, $parent = null, $parentNames = array())
     {
         $generatedPermissions = array();
-        $leftPermission = null;
+        $weight = 0;
         foreach ($permissions as $permissionName => $permissionConfiguration) {
+            $name = implode('.', array_merge($parentNames, (array)$permissionName));
             $aclPermissionClass = $this->repository->getClassName();
             /** @var $aclPermission \Briareos\AclBundle\Entity\AclPermission */
-            $aclPermission = new $aclPermissionClass();
-            $aclPermission->setName(implode('.', array_merge($parentNames, (array)$permissionName)));
+            $aclPermission = $this->repository->findOneBy(array('name' => $name));
+            if (!$aclPermission) {
+                $aclPermission = new $aclPermissionClass();
+                $aclPermission->setName($name);
+            }
+            if (isset($permissionConfiguration['weight'])) {
+                $aclPermission->setWeight($permissionConfiguration['weight']);
+            } else {
+                $weight += 10;
+                $aclPermission->setWeight($weight);
+            }
             if (!empty($permissionConfiguration['description'])) {
                 $aclPermission->setDescription($permissionConfiguration['description']);
             }
@@ -81,12 +89,6 @@ class PermissionBuilder
             if ($parent !== null) {
                 $aclPermission->setParent($parent);
             }
-
-            // To keep it ordered.
-            if ($leftPermission !== null) {
-                $aclPermission->setLft($leftPermission);
-            }
-            $leftPermission = $aclPermission;
         }
         return $generatedPermissions;
     }

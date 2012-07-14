@@ -27,19 +27,18 @@ class AclRoleAdmin extends Admin implements ContainerAwareInterface
             ->with('admin.role.role')
             ->add('name', null, array(
             'label' => 'admin.form.role.name',
-        ))
-            ->add('permissions', 'role_permissions', array(
-            'label' => 'admin.form.role.permissions',
-            'property' => 'name',
-            'translation_domain' => 'permissions',
-            'group_by' => 'domain',
-            'expanded' => true,
-            'required' => false,
-        ))
-            ->setHelps(array(
-            'name' => $this->trans('help_post_title')
-        ))
-            ->end();
+        ));
+        if ($this->isGranted('edit.permissions')) {
+            $form->add('permissions', 'role_permissions', array(
+                'label' => 'admin.form.role.permissions',
+                'property' => 'name',
+                'translation_domain' => 'permissions',
+                'group_by' => 'domain',
+                'expanded' => true,
+                'required' => false,
+            ));
+        }
+        $form->end();
     }
 
     public function configureListFields(ListMapper $list)
@@ -71,8 +70,6 @@ class AclRoleAdmin extends Admin implements ContainerAwareInterface
     {
         $this->container = $container;
     }
-
-
 
 
 }

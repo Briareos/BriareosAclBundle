@@ -61,6 +61,7 @@ class AclPermission
 
     public function __construct()
     {
+        $this->weight = 0;
         $this->secure = false;
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -271,5 +272,56 @@ class AclPermission
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Add children
+     *
+     * @param Briareos\AclBundle\Entity\AclPermission $children
+     * @return AclPermission
+     */
+    public function addChildren(\Briareos\AclBundle\Entity\AclPermission $children)
+    {
+        $this->children[] = $children;
+    
+        return $this;
+    }
+
+    /**
+     * Remove children
+     *
+     * @param Briareos\AclBundle\Entity\AclPermission $children
+     */
+    public function removeChildren(\Briareos\AclBundle\Entity\AclPermission $children)
+    {
+        $this->children->removeElement($children);
+    }
+    /**
+     * @var integer $weight
+     */
+    private $weight;
+
+
+    /**
+     * Set weight
+     *
+     * @param integer $weight
+     * @return AclPermission
+     */
+    public function setWeight($weight)
+    {
+        $this->weight = $weight;
+    
+        return $this;
+    }
+
+    /**
+     * Get weight
+     *
+     * @return integer 
+     */
+    public function getWeight()
+    {
+        return $this->weight;
     }
 }

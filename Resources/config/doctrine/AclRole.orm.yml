@@ -1,6 +1,7 @@
 Briareos\AclBundle\Entity\AclRole:
     type: entity
     table: acl__role
+    repositoryClass: Briareos\AclBundle\Entity\AclRoleRepository
     id:
         id:
             type: integer
@@ -20,18 +21,7 @@ Briareos\AclBundle\Entity\AclRole:
     manyToMany:
         subjects:
             targetEntity: Briareos\AclBundle\Entity\AclSubjectInterface
-            joinTable:
-                name: acl__subject_role
-                joinColumns:
-                    subject:
-                        name: subject_id
-                        referencedColumnName: id
-                        onDelete: CASCADE
-                inverseJoinColumns:
-                    aclRole:
-                        name: aclRole_id
-                        referencedColumnName: id
-                        onDelete: CASCADE
+            mappedBy: aclRoles
         permissions:
             targetEntity: Briareos\AclBundle\Entity\AclPermission
             joinTable:

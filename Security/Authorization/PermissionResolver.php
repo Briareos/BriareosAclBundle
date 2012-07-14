@@ -12,55 +12,62 @@ class PermissionResolver
 {
     private $em;
 
+    /**
+     * @var \Briareos\AclBundle\Entity\AclRoleRepository
+     */
     private $repository;
 
-    private $userPermissions = array();
+    private $subjectPermissions = array();
 
     private $rolePermissions = array();
 
-    public function __construct(EntityManager $em, $class)
+    private $superAdminRole;
+
+    public function __construct(EntityManager $em, $class, $superAdminRole)
     {
         $this->em = $em;
         $this->repository = $this->em->getRepository($class);
+        $this->superAdminRole = $superAdminRole;
     }
 
     public function getPermissions(TokenInterface $token)
     {
-        /** @var $user AclSubjectInterface */
-        $user = $token->getUser();
-        $userId = 0;
-        if ($user instanceof AclSubjectInterface) {
-            $userId = $user->getId();
+        /** @var $subject AclSubjectInterface */
+        $subject = $token->getUser();
+        $subjectId = 0;
+        if ($subject instanceof AclSubjectInterface) {
+            $subjectId = $subject->getId();
         }
-        if (!isset($this->userPermissions[$userId])) {
-            $this->userPermissions[$userId] = array();
-            if ($userId) {
-                /** @var $userRole AclRole */
-                foreach ($user->getUserRoles() as $userRole) {
-                    $userRoles[$userRole->getId()] = $userRole;
+        if (!isset($this->subjectPermissions[$subjectId])) {
+            $this->subjectPermissions[$subjectId] = array();
+            if ($subjectId) {
+                /** @var $subjectRole AclRole */
+                foreach ($subject->getAclRoles() as $subjectRole) {
+                    $subjectRoles[$subjectRole->getId()] = $subjectRole;
                 }
-                /** @var $authenticatedUserRole AclRole */
-                $authenticatedUserRole = $this->em->getRepository('Briareos\AclBundle\Entity\AclRole')->findOneBy(array('internalRole' => Role::AUTHENTICATED_USER));
-                $userRoles[$authenticatedUserRole->getId()] = $authenticatedUserRole;
+                /** @var $authenticatedRole AclRole */
+                $authenticatedRole = $this->repository->findOneBy(array('internalRole' => AclRole::AUTHENTICATED_USER));
+                $subjectRoles[$authenticatedRole->getId()] = $authenticatedRole;
             } else {
                 /** @var $anonymousRole AclRole */
-                $anonymousRole = $this->em->getRepository('Briareos\AclBundle\Entity\AclRole')->findOneBy(array('internalRole' => Role::ANONYMOUS_USER));
-                $userRoles = array($anonymousRole->getId() => $anonymousRole);
+                $anonymousRole = $this->repository->findOneBy(array('internalRole' => AclRole::ANONYMOUS_USER));
+                $subjectRoles = array($anonymousRole->getId() => $anonymousRole);
             }
-            foreach ($userRoles as $userRole) {
-                $this->userPermissions[$userId] += $this->getRolePermissions($userRole);
+            foreach ($subjectRoles as $subjectRole) {
+                $this->subjectPermissions[$subjectId] += $this->getRolePermissions($subjectRole);
             }
         }
-        return $this->userPermissions[$userId];
+        return $this->subjectPermissions[$subjectId];
     }
 
     public function getRolePermissions(AclRole $role)
     {
         if (!isset($this->rolePermissions[$role->getId()])) {
             $this->rolePermissions[$role->getId()] = array();
-            if ($role->getInternalRole() === Role::ADMINISTRATOR) {
-                $this->rolePermissions[$role->getId()]['ROLE_SUPER_ADMIN'] = true;
+            if ($role->getInternalRole() === AclRole::ADMINISTRATOR) {
+                $this->rolePermissions[$role->getId()][$this->superAdminRole] = true;
             }
+            /** @var $permission AclPermission */
             foreach ($role->getPermissions() as $permission) {
                 $this->rolePermissions[$role->getId()][$permission->getName()] = true;
             }

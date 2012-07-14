@@ -147,18 +147,6 @@ class AclRole
     }
 
     /**
-     * Add subjects
-     *
-     * @param \App\UserBundle\Entity\User $subjects
-     * @return AclRole
-     */
-    public function addUser(\App\UserBundle\Entity\User $subjects)
-    {
-        $this->subjects[] = $subjects;
-        return $this;
-    }
-
-    /**
      * Get subjects
      *
      * @return \Doctrine\Common\Collections\Collection
@@ -168,8 +156,49 @@ class AclRole
         return $this->subjects;
     }
 
-    public function __toString()
+    /**
+     * Add subjects
+     *
+     * @param AclSubjectInterface $subject
+     * @return AclRole
+     */
+    public function addSubject(AclSubjectInterface $subject)
     {
-        return $this->getName();
+        $this->subjects[] = $subject;
+        return $this;
+    }
+
+    /**
+     * Remove subjects
+     *
+     * @param AclSubjectInterface $subjects
+     * @return AclRole
+     */
+    public function removeSubject(AclSubjectInterface $subjects)
+    {
+        $this->subjects->removeElement($subjects);
+        return $this;
+    }
+
+    /**
+     * Add permissions
+     *
+     * @param AclPermission $permissions
+     * @return AclRole
+     */
+    public function addPermission(\Briareos\AclBundle\Entity\AclPermission $permissions)
+    {
+        $this->permissions[] = $permissions;
+        return $this;
+    }
+
+    /**
+     * Remove permissions
+     *
+     * @param \Briareos\AclBundle\Entity\AclPermission $permissions
+     */
+    public function removePermission(\Briareos\AclBundle\Entity\AclPermission $permissions)
+    {
+        $this->permissions->removeElement($permissions);
     }
 }

@@ -2,47 +2,21 @@
 {% set tree_id = id~'-container' %}
 <script>
     $(document).ready(function () {
-        var checkboxes, checkSiblings;
-        checkSiblings = function (el, checked) {
-            var parent = el.parent().parent(),
-                    all = true;
+        var treeContext, checkboxes;
 
-            el.siblings().each(function () {
-                return all = ($(this).children('input[type="checkbox"]').prop("checked") === checked);
-            });
+        treeContext = $('#{{ tree_id }}');
+        checkboxes = $('input[type="checkbox"]', treeContext).change(function (e) {
+            var checked, childCheckboxes, parentCheckboxes;
+            checked = $(this).prop('checked');
+            childCheckboxes = $('ul input[type="checkbox"]', $(this).closest('li'));
+            parentCheckboxes = $(this).closest('li').parentsUntil(treeContext, 'li').find('input[type="checkbox"]:first');
 
-            if (all && checked) {
-                parent.children('input[type="checkbox"]').prop({
-                    indeterminate:false,
-                    checked:checked
-                });
-                checkSiblings(parent);
-            } else if (all && !checked) {
-                parent.children('input[type="checkbox"]').prop("checked", checked);
-                parent.children('input[type="checkbox"]').prop("indeterminate", (parent.find('input[type="checkbox"]:checked').length > 0));
-                checkSiblings(parent);
-            } else {
-                el.parents("li").children('input[type="checkbox"]').prop({
-                    indeterminate:true,
-                    checked:false
-                });
+            // Cascade the checked/unchecked state to its children.
+            childCheckboxes.prop('checked', checked);
+            if (checked) {
+                // Cascade the checked state to parents.
+                parentCheckboxes.prop('checked', true);
             }
-        };
-        checkboxes = $('#{{tree_id}} input[type="checkbox"]');
-        checkboxes.change(function (e) {
-            var checked = $(this).prop("checked"),
-                    container = $(this).parent(),
-                    siblings = container.siblings();
-            console.log(container);
-            console.log(siblings);
-            container.find('input[type="checkbox"]').prop({
-                indeterminate:false,
-                checked:checked
-            });
-            checkSiblings(container, checked);
-        });
-        checkboxes.filter(':checked').each(function (i, el) {
-            checkSiblings($(el).parent(), true);
         });
     });
 </script>

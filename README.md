@@ -20,6 +20,39 @@ per bundle.
                 resolve_target_entities:
                     Briareos\AclBundle\Entity\AclSubject: App\UserBundle\Entity\User
 
+1.  Since the user entity must be on the owning side, map the AclRole entity from your user entity:
+
+    Annotation:
+
+        # App\UserBundle\Entity\User
+        /**
+         * @var ArrayCollection
+         *
+         * @ORM\ManyToMany(targetEntity="Briareos\AclBundle\Entity\AclRole", inversedBy="subjects")
+         * @ORM\JoinTable(name="acl__subject_role",
+         *  joinColumns={@ORM\JoinColumn(name="subject_id", referencedColumnName="id", onDelete="CASCADE")},
+         *  inverseJoinColumns={@ORM\JoinColumn(name="aclRole_id", referencedColumnName="id", onDelete="CASCADE")}
+         * )
+         */
+        private $aclRoles;
+
+    YML
+
+        # App\UserBundle\Resources\config\doctrine\User.orm.yml
+        joinTable:
+            name: acl__subject_role
+            inversedBy: subjects
+            joinColumns:
+                subject:
+                    name: subject_id
+                    referencedColumnName: id
+                    onDelete: CASCADE
+            inverseJoinColumns:
+                aclRole:
+                    name: aclRole_id
+                    referencedColumnName: id
+                    onDelete: CASCADE
+
 1. Update your schema
 
         $ php app/console doctrine:schema:update --force
