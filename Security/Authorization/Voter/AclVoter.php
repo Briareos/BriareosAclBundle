@@ -69,7 +69,12 @@ class AclVoter implements VoterInterface
                 if (isset($roles[$attribute])) {
                     return self::ACCESS_GRANTED;
                 }
-                if($attribute !== 'administrator') var_dump($attribute);
+                if ($attribute !== 'administrator') {
+                    if ($attribute === 'role_sonata_admin') {
+                        return self::ACCESS_GRANTED;
+                    }
+                    var_dump($attribute);
+                }
                 return self::ACCESS_DENIED;
             }
         }

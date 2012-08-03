@@ -5,7 +5,7 @@ namespace Briareos\AclBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Doctrine\ORM\EntityManager;
 
@@ -40,7 +40,7 @@ class RolePermissionsType extends AbstractType
         return 'entity';
     }
 
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $nodes = $this->repository
             ->createQueryBuilder('node')
@@ -49,9 +49,7 @@ class RolePermissionsType extends AbstractType
             ->getArrayResult();
         $tree = $this->repository->buildTree($nodes);
 
-        $view->addVars(array(
-            'tree' => $tree,
-        ));
+        $view->vars['tree'] = $tree;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
