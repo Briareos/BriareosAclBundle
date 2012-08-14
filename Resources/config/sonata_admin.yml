@@ -17,7 +17,7 @@ services:
             - Briareos\AclBundle\Entity\AclRole
             - SonataAdminBundle:CRUD
         tags:
-            - { name: sonata.admin, manager_type: orm, label: sonata.admin.label.acl_roles }
+            - { name: sonata.admin, manager_type: orm, label: admin.label.acl_roles }
         calls:
             - [ setContainer, [ @service_container ] ]
     sonata.admin.briareos_acl.permission_container:
