@@ -6,13 +6,13 @@ This bundle integrates access permissions using the following relationship model
 
 So one user can have multiple roles and each role may grant multiple permissions. Permissions are pulled from permission
 containers that are tagged with `security.permission_container`. There should be a maximum of one permission container
-per bundle.
+per bundle. It integrates nicely with *SonataAdminBundle*.
 
 ## Instructions
 
 1.  Your user class must implement `Briareos\AclBundle\Entity\AclSubject` interface.
 
-1.  Map the interface to your user bundle, so that relationships can work
+1.  Map the interface to your user bundle, so that relationships can work:
 
         # app/config/config.yml
         doctrine:
@@ -53,11 +53,11 @@ per bundle.
                     referencedColumnName: id
                     onDelete: CASCADE
 
-1.  Update your schema
+1.  Update your schema:
 
         $ php app/console doctrine:schema:update --force
 
-1   Update your `config.yml` file to include addutional form resources:
+1.  Update your `config.yml` file to include additional form resources, for nice display of the permission tree:
 
         # app/config/config.yml
         twig:
@@ -65,11 +65,62 @@ per bundle.
                 form:
                     - "BriareosAclBundle::fields.html.twig"
 
-### If you're using *SonataAdminBundle*
+1.  By default, there are 3 services in Symfony tagged as security voters.
+    As this service should replace two of them (for now), it is recommended to disable others than `AuthenticatedVoter`:
 
-1.  Chance the security handler to `sonata.admin.security.handler.briareos_acl`
+        # app/config/security.yml
+        jms_security_extra:
+            voters:
+                disable_role: true
+                disable_acl: true
+
+### If you're using *SonataAdminBundle*:
+
+1.  Chance the security handler to `sonata.admin.security.handler.briareos_acl`:
 
         sonata_admin:
             security:
                 handler: sonata.admin.security.handler.briareos_acl
 
+
+## Example
+
+If you're using *SonataMediaBundle*, this permission container should take care of adding permissions for *Media* and *Gallery* entities:
+
+        <?php
+        
+        namespace Application\Sonata\MediaBundle\Admin;
+        
+        use Briareos\AclBundle\Security\Authorization\PermissionContainerInterface;
+        
+        class PermissionContainer implements PermissionContainerInterface
+        {
+            public function getPermissions()
+            {
+                return array(
+                    'admin' => array(
+                        '__children' => array(
+                            'applicationsonatamediabundle_media' => array(
+                                'weight' => 11,
+                                '__children' => array(
+                                    'create' => array(),
+                                    'list' => array(),
+                                    'edit' => array(),
+                                    'delete' => array(),
+                                ),
+                            ),
+                            'applicationsonatamediabundle_gallery' => array(
+                                'weight' => 12,
+                                '__children' => array(
+                                    'create' => array(),
+                                    'list' => array(),
+                                    'edit' => array(),
+                                    'delete' => array(),
+                                ),
+                            ),
+                        ),
+                    ),
+                );
+            }
+        
+        }
