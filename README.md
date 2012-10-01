@@ -87,40 +87,51 @@ per bundle. It integrates nicely with *SonataAdminBundle*.
 
 If you're using *SonataMediaBundle*, this permission container should take care of adding permissions for *Media* and *Gallery* entities:
 
-        <?php
-        
-        namespace Application\Sonata\MediaBundle\Admin;
-        
-        use Briareos\AclBundle\Security\Authorization\PermissionContainerInterface;
-        
-        class PermissionContainer implements PermissionContainerInterface
+    <?php
+
+    namespace Application\Sonata\MediaBundle\Admin;
+
+    use Briareos\AclBundle\Security\Authorization\PermissionContainerInterface;
+
+    class PermissionContainer implements PermissionContainerInterface
+    {
+        public function getPermissions()
         {
-            public function getPermissions()
-            {
-                return array(
-                    'admin' => array(
-                        '__children' => array(
-                            'applicationsonatamediabundle_media' => array(
-                                'weight' => 11,
-                                '__children' => array(
-                                    'create' => array(),
-                                    'list' => array(),
-                                    'edit' => array(),
-                                    'delete' => array(),
-                                ),
+            return array(
+                'admin' => array(
+                    '__children' => array(
+                        'applicationsonatamediabundle_media' => array(
+                            'weight' => 11,
+                            '__children' => array(
+                                'create' => array(),
+                                'list' => array(),
+                                'edit' => array(),
+                                'delete' => array(),
                             ),
-                            'applicationsonatamediabundle_gallery' => array(
-                                'weight' => 12,
-                                '__children' => array(
-                                    'create' => array(),
-                                    'list' => array(),
-                                    'edit' => array(),
-                                    'delete' => array(),
-                                ),
+                        ),
+                        'applicationsonatamediabundle_gallery' => array(
+                            'weight' => 12,
+                            '__children' => array(
+                                'create' => array(),
+                                'list' => array(),
+                                'edit' => array(),
+                                'delete' => array(),
                             ),
                         ),
                     ),
-                );
-            }
-        
+                ),
+            );
         }
+
+    }
+
+The permission keys are interpreted as `admin.applicationsonatamediabundle_gallery.edit`, but can be as short as `main_bundle.user.create`.
+Permissions can be nested to suit your application's needs, like `admin.userbundle_user.edit.groups`.
+
+## Todo
+
+1.  Make it possible to configure `AclSecurityHandler` (that implements `Sonata\AdminBundle\Security\Handler\RoleSecurityHandler`)
+
+1.  Implement caching mechanism inside `AclVoter`.
+
+1.  Have an interface that enables entities to return their 'owners' and other related entities.
