@@ -22,8 +22,8 @@ services:
     briareos_acl.permission_loader:
         class: %briareos_acl.permission_loader.class%
         arguments: [ @briareos_acl.permission_builder ]
-        tags:
-            - { name: kernel.cache_warmer }
+        #tags:
+        #    - { name: kernel.cache_warmer }
     briareos_acl.permission_resolver:
         class: %briareos_acl.permission_resolver.class%
         arguments:
